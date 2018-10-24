@@ -7,9 +7,9 @@
 }
 
 .board {
-  background: black;
-  display: grid;
-  grid-template-columns: repeat(10, 1fr);
+  background: blue;
+
+  margin-top: 100px;
 }
 
 .space {
