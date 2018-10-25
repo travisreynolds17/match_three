@@ -5,7 +5,7 @@
 
 .board {
   background: blue;
-  margin-top: 100px; }
+  margin: 50px; }
 
 .space {
   border: 1px solid white;
