@@ -12,6 +12,8 @@ board.width = board.height = Math.floor(0.6 * window.innerWidth);
 
 let spaces = [];
 let tokens = [];
+let iterations = 0; // will hold number of new boards created before a clean one
+
 // holds possible type of token. Later to be replaced with pictures?
 let tokenValues = [
   "green",
@@ -59,11 +61,14 @@ function initBoard(length, width, tileSize) {
     }
   }
   spaces = setBoardValues(spaces);
-  testValues(spaces);
-  // if (matchTest(spaces)) {
-  //   init();
-  // }
-  initTokens(spaces);
+
+  if (testValues(spaces)) {
+    iterations++;
+    init();
+  } else {
+    iterations = 0;
+    initTokens(spaces);
+  }
 }
 
 // I know this functin is horrible. We will break it down at some point. I'm convinced I can push all these whiles into a foor loop.
@@ -131,6 +136,22 @@ function testValues(array) {
   tempX[7] = temp;
   temp = "";
 
+  // get y values
+  let j = "";
+  let state = false;
+
+  // loop through the tempY array. We're making an array representing column values from tempX
+  for (let i = 0; i < rows; i++) {
+    // loop through tempX array elements, one by one, and grab one element from each column
+    for (let k = 0; k < rows; k++) {
+      temp = tempX[k].split("");
+      j += temp[i];
+    }
+    tempY[i] = j;
+    j = "";
+  }
+  console.log(tempY);
+
   // break each row into testable arrays
   for (let i = 0; i < tempX.length; i++) {
     temp = tempX[i].split("");
@@ -139,125 +160,31 @@ function testValues(array) {
     //test for three consecutive repeating values (a match)
     for (let k = 0; k < temp.length; k++) {
       if (temp[k] == temp[k + 1] && temp[k] == temp[k + 2]) {
-        console.log("match found at");
+        console.log("horiz match found at");
         console.log(i, k);
+        state = true;
       }
     }
   }
+
+  // break each column into testable arrays
+  for (let i = 0; i < tempY.length; i++) {
+    temp = tempY[i].split("");
+    temp.forEach(item => (item = parseInt(item)));
+
+    //test for three consecutive repeating values (a match)
+    for (let k = 0; k < temp.length; k++) {
+      if (temp[k] == temp[k + 1] && temp[k] == temp[k + 2]) {
+        console.log("vert match found at");
+        console.log(i, k);
+        state = true;
+      }
+    }
+  }
+  if (state == true) {
+    return true;
+  }
 }
-
-// pass the pre-filled spaces array into this function to test for matches.
-// function matchTest(array) {
-//   let tempX = [];
-//   let tempY = [];
-//   for (let i = 0; i < array.length; i++) {
-//     if ((array[i].row = i)) {
-//       tempX.push(array[i]);
-//     }
-//     if ((array[i].col = i)) {
-//       tempY.push(array[i]);
-//     }
-//   }
-
-//   for (i = 0; i < tempX.length; i++) {
-//     let xChecked = testLimitX(tempX, i);
-//     console.log(xChecked);
-//     let yChecked = testLimitY(tempY, i);
-//     console.log(yChecked);
-//     if (xChecked || yChecked) {
-//       tempX = [];
-//       tempY = [];
-//       console.log("match found");
-//       falseBoards++;
-//       if (falseBoards >= 500) {
-//         console.log("Limit reached");
-//         break;
-//       }
-//       return true;
-//     } else {
-//       return false;
-//     }
-//   }
-// }
-
-// // pre-game. Checks all spaces with the same X value for matches.
-
-// function testLimitX(tempX, i) {
-//   let limit = rows - 1;
-//   if (tempX[i].row >= limit) {
-//     tempX[i].clearRight = false;
-//   } else {
-//     tempX[i].clearRight = true;
-//   }
-//   if (tempX[i].row <= 1) {
-//     tempX[i].clearLeft = false;
-//   } else {
-//     tempX[i].clearLeft = true;
-//   }
-
-//   return testMatchX(tempX, i);
-// }
-
-// function testLimitY(tempY, i) {
-//   let limit = cols - 1;
-//   if (tempY[i].col >= limit) {
-//     tempY[i].clearDown = false;
-//   } else {
-//     tempY[i].clearDown = true;
-//   }
-
-//   if (tempY[i].col <= 1) {
-//     tempY[i].clearUp = false;
-//   } else {
-//     tempY[i].clearDown = true;
-//   }
-
-//   return testMatchY(tempY, i);
-// }
-// // test for matches under different conditions
-// function testMatchY(tempY, i) {
-//   if (tempY[i].clearDown) {
-//     if (
-//       tempY[i].value == tempY[i + 1].value &&
-//       tempY[i].value == tempY[i + 2].value
-//     ) {
-//       return true;
-//     }
-//   }
-
-//   if (tempY[i].clearUp) {
-//     if (
-//       tempY[i].value == tempY[i - 1].value &&
-//       tempY[i].value == tempY[i - 2].value
-//     ) {
-//       return true;
-//     }
-//   }
-
-//   return false;
-// }
-
-// function testMatchX(tempX, i) {
-//   if (tempX[i].clearRight) {
-//     if (
-//       tempX[i].value == tempX[i + 1].value &&
-//       tempX[i].value == tempX[i + 2].value
-//     ) {
-//       return true;
-//     }
-//   }
-
-//   if (tempX[i].clearLeft) {
-//     if (
-//       tempX[i].value == tempX[i - 1].value &&
-//       tempX[i].value == tempX[i - 2].value
-//     ) {
-//       return true;
-//     }
-//   }
-
-//   return false;
-// }
 
 function setBoardValues(array) {
   // assigns each space a numeric value between 0 and 5. These values represent game takens.
